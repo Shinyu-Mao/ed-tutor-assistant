@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Environment — never commit API keys
+backend/.env
+
+# Data — keep out of version control
+data/
+
+# macOS
+.DS_Store

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Ed Tutor Assistant — Settings</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      color: #222;
+      background: #f4f6fa;
+      padding: 32px;
+    }
+
+    h1 {
+      font-size: 20px;
+      color: #1F4E79;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      color: #888;
+      font-size: 13px;
+      margin-bottom: 28px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 24px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      max-width: 540px;
+    }
+
+    .card h2 {
+      font-size: 13px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #555;
+      margin-bottom: 16px;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field:last-child {
+      margin-bottom: 0;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      font-size: 13px;
+      margin-bottom: 5px;
+      color: #333;
+    }
+
+    .hint {
+      font-size: 11px;
+      color: #999;
+      margin-top: 4px;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: Arial, sans-serif;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input:focus, select:focus {
+      border-color: #2E75B6;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: #7B2FBE;
+    }
+
+    .range-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .range-value {
+      font-size: 13px;
+      font-weight: bold;
+      color: #7B2FBE;
+      min-width: 28px;
+      text-align: right;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      max-width: 540px;
+    }
+
+    button#save {
+      background: #2E75B6;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 24px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button#save:hover { background: #1F5F99; }
+
+    button#reset {
+      background: none;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      padding: 10px 16px;
+      font-size: 13px;
+      cursor: pointer;
+      color: #666;
+    }
+
+    button#reset:hover { background: #f0f0f0; }
+
+    #status {
+      font-size: 13px;
+      color: #375623;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎓 Ed Tutor Assistant — Settings</h1>
+  <p class="subtitle">Changes are saved to your browser and applied immediately.</p>
+
+  <div class="card">
+    <h2>API</h2>
+    <div class="field">
+      <label for="apiKey">Anthropic API Key</label>
+      <input type="password" id="apiKey" placeholder="sk-ant-…" autocomplete="off">
+      <p class="hint">Stored locally in your browser. Never sent anywhere except the local backend.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Search</h2>
+    <div class="field">
+      <label for="topK">Number of matched threads to show</label>
+      <div class="range-row">
+        <input type="range" id="topK" min="1" max="8" step="1" value="3">
+        <span class="range-value" id="topKVal">3</span>
+      </div>
+      <p class="hint">More results give the LLM more context but may slow down the response.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Answer Style</h2>
+    <div class="field">
+      <label for="style">Tone</label>
+      <select id="style">
+        <option value="friendly">Friendly &amp; concise (default)</option>
+        <option value="formal">Formal</option>
+        <option value="bullet">Bullet points</option>
+        <option value="detailed">Detailed explanation</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="maxWords">Maximum reply length (words)</label>
+      <div class="range-row">
+        <input type="range" id="maxWords" min="50" max="400" step="25" value="150">
+        <span class="range-value" id="maxWordsVal">150</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button id="save">Save</button>
+    <button id="reset">Reset to defaults</button>
+    <span id="status"></span>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

@@ -49,6 +49,12 @@ app.add_middleware(
 class SuggestRequest(BaseModel):
     title: str
     body: str
+    category: str | None = None
+    subcategory: str | None = None
+    api_key: str | None = None
+    top_k: int | None = None
+    style: str | None = None
+    max_words: int | None = None
 
 
 class MatchedThread(BaseModel):
@@ -74,14 +80,30 @@ def suggest(req: SuggestRequest):
     if not req.title.strip() and not req.body.strip():
         raise HTTPException(status_code=400, detail="Title and body cannot both be empty.")
 
-    top_k = int(os.environ.get("TOP_K", 3))
+    top_k = req.top_k or int(os.environ.get("TOP_K", 3))
     query = f"{req.title} {req.body}"
-    matches = search_module.search(query, top_k=top_k)
+    matches, category_found = search_module.search(
+        query, top_k=top_k,
+        category=req.category,
+        subcategory=req.subcategory,
+    )
+
+    if not category_found:
+        label = " / ".join(filter(None, [req.category, req.subcategory]))
+        raise HTTPException(
+            status_code=404,
+            detail=f"No records found for category '{label}'. The knowledge base may not cover this topic yet."
+        )
 
     if not matches:
         raise HTTPException(status_code=404, detail="No matching records found.")
 
-    answer = generate_module.generate_answer(req.title, req.body, matches)
+    answer = generate_module.generate_answer(
+        req.title, req.body, matches,
+        api_key=req.api_key,
+        style=req.style or "friendly",
+        max_words=req.max_words or 150,
+    )
 
     return SuggestResponse(
         suggested_answer=answer,

@@ -54,6 +54,24 @@
   gap: 12px;
 }
 
+#eta-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 0;
+}
+
+.eta-tag {
+  display: inline-block;
+  background: #7B2FBE;
+  color: #fff;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 3px 9px;
+  border-radius: 12px;
+  letter-spacing: 0.3px;
+}
+
 #eta-suggest-btn {
   background: #2E75B6;
   color: #fff;

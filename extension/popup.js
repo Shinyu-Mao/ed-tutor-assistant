@@ -1,5 +1,11 @@
 const statusEl = document.getElementById("status");
 
+document.getElementById("open-settings").addEventListener("click", e => {
+  e.preventDefault();
+  chrome.runtime.openOptionsPage();
+});
+
+
 fetch("http://localhost:8765/health")
   .then(r => r.json())
   .then(d => {

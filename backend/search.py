@@ -56,19 +56,48 @@ def load_knowledge_base(path: str) -> None:
     print(f"Knowledge base loaded: {len(_records)} records indexed.")
 
 
-def search(query: str, top_k: int = 3) -> list[dict]:
-    """Return the top-k most similar records for a query."""
+def search(
+    query: str,
+    top_k: int = 3,
+    category: str | None = None,
+    subcategory: str | None = None,
+) -> list[dict]:
+    """Return the top-k most similar records for a query.
+
+    If category/subcategory are provided, search is restricted to matching
+    records. Falls back to global search if no records match the filter.
+    """
     if _embeddings is None or len(_records) == 0:
         return []
 
+    # Build index mask for category filter
+    def matches_filter(rec):
+        if category and rec["category"].lower() != category.lower():
+            return False
+        if subcategory and rec["subcategory"].lower() != subcategory.lower():
+            return False
+        return True
+
+    indices = [i for i, r in enumerate(_records) if matches_filter(r)]
+
+    # If a filter was requested but nothing matched, signal the caller
+    if (category or subcategory) and not indices:
+        return [], False   # (results, category_found)
+
+    if not indices:
+        indices = list(range(len(_records)))
+
     model = _get_model()
     q_emb = model.encode([query], normalize_embeddings=True)[0]
-    scores = _embeddings @ q_emb          # cosine similarity (embeddings are normalised)
-    top_idx = np.argsort(scores)[::-1][:top_k]
+
+    # Score only the filtered subset
+    subset_scores = _embeddings[indices] @ q_emb
+    top_local = np.argsort(subset_scores)[::-1][:top_k]
 
     results = []
-    for idx in top_idx:
-        rec = _records[idx].copy()
-        rec["score"] = float(scores[idx])
+    for local_idx in top_local:
+        global_idx = indices[local_idx]
+        rec = _records[global_idx].copy()
+        rec["score"] = float(subset_scores[local_idx])
         results.append(rec)
-    return results
+    return results, True   # (results, category_found)

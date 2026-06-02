@@ -43,6 +43,18 @@ function getQuestionBody() {
   return "";
 }
 
+function getCategoryInfo() {
+  const el = document.querySelector("span.disthrb-category, [class*='disthrb-category']");
+  if (!el) return { category: null, subcategory: null };
+  // Text is like "Project – P2" or "Lectures – Week1"
+  const parts = el.innerText.split(/[–—-]/).map(s => s.trim());
+  return {
+    category: parts[0] || null,
+    subcategory: parts[1] || null,
+    color: el.style.color || null,
+  };
+}
+
 function getReplyBox() {
   // Try to find a ProseMirror / contenteditable reply editor
   const selectors = [
@@ -83,6 +95,7 @@ function buildSidebar() {
       <button id="eta-close" title="Hide sidebar">✕</button>
     </div>
     <div id="eta-body">
+      <div id="eta-tags"></div>
       <button id="eta-suggest-btn">Suggest Answer</button>
       <div id="eta-status"></div>
 
@@ -173,8 +186,22 @@ function setStatus(msg, color = "#666") {
 async function fetchSuggestion() {
   const title = getQuestionTitle();
   const body = getQuestionBody();
-  console.log("[ETA] title:", title);
-  console.log("[ETA] body:", body?.slice(0, 150));
+  const { category, subcategory, color } = getCategoryInfo();
+
+  // Render category tags
+  const tagsEl = document.getElementById("eta-tags");
+  tagsEl.innerHTML = "";
+  if (category) {
+    const tag = (label, bg) => {
+      const s = document.createElement("span");
+      s.className = "eta-tag";
+      s.textContent = label;
+      if (bg) s.style.background = bg;
+      return s;
+    };
+    tagsEl.appendChild(tag(category, color));
+    if (subcategory) tagsEl.appendChild(tag(subcategory, color));
+  }
 
   const btn = document.getElementById("eta-suggest-btn");
   btn.disabled = true;
@@ -182,11 +209,22 @@ async function fetchSuggestion() {
   document.getElementById("eta-answer-box").style.display = "none";
   document.getElementById("eta-matches").style.display = "none";
 
+  // Load user settings from storage
+  const prefs = await new Promise(resolve =>
+    chrome.storage.sync.get({ apiKey: "", topK: 3, style: "friendly", maxWords: 150 }, resolve)
+  );
+
   try {
     const res = await fetch(`${BACKEND}/suggest`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, body }),
+      body: JSON.stringify({
+        title, body, category, subcategory,
+        api_key: prefs.apiKey || null,
+        top_k: prefs.topK,
+        style: prefs.style,
+        max_words: prefs.maxWords,
+      }),
     });
 
     if (!res.ok) {

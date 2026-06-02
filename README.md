@@ -1,4 +1,4 @@
-# Ed Tutor Assistant — RAG-powered Reply Assistant for Ed Discussion
+# Ed Tutor Assistant <br> RAG-powered Reply Assistant for Ed Discussion
 
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)

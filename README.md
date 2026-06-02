@@ -131,6 +131,19 @@ Click the toolbar icon → **⚙ Settings** to open the options page:
 
 ## Data Format
 
+### Exporting from Ed Discussion
+
+Ed Discussion has a built-in JSON export:
+
+1. Go to your course on Ed Discussion
+2. Click **Discussion** in the top navigation
+3. Click **↓ Threads JSON** in the top bar (next to Analytics CSV)
+4. Save the downloaded file into the `data/` directory
+
+The exported file is already in the correct format — no conversion needed. Run it through `anonymise.py` before committing or sharing to remove student names and emails.
+
+---
+
 `DATA_PATH` in `.env` can point to either a single JSON file or a directory. If a directory is given, all `.json` files inside are loaded and merged at startup — useful for splitting data by semester or course.
 
 Each JSON file must be an array. Each object with at least one answer will be indexed:

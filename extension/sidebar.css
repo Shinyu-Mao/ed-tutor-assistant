@@ -1,28 +1,146 @@
+/* ── Design tokens ─────────────────────────────────────────────────────────── */
+:root {
+  --dark:       #1a1a2e;
+  --dark-card:  #16213e;
+  --surface:    #f4f6fa;
+  --card:       #ffffff;
+  --green:      #7fe07f;
+  --green-dark: #4caf50;
+  --purple:     #b8a0f8;
+  --purple-dark:#7B2FBE;
+  --text-primary:   #1a1a2e;
+  --text-secondary: #6b7280;
+  --text-muted:     #9ca3af;
+  --text-on-dark:   #ffffff;
+  --radius-lg: 20px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  --radius-pill: 999px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.10);
+  --shadow-card: 0 2px 12px rgba(0,0,0,0.07);
+}
+
+/* ── Floating panel ────────────────────────────────────────────────────────── */
 #eta-sidebar {
   position: fixed;
-  top: 64px;
-  right: 0;
-  width: 360px;
-  height: calc(100vh - 64px);
-  background: #ffffff;
-  border-left: 2px solid #2E75B6;
-  box-shadow: -4px 0 16px rgba(0,0,0,0.12);
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  width: clamp(280px, 28vw, 480px);
+  min-width: 260px;
+  max-width: min(560px, 92vw);
+  min-height: 160px;
+  max-height: 82vh;
+  background: var(--surface);
   z-index: 99999;
   display: flex;
   flex-direction: column;
-  font-family: Arial, sans-serif;
-  font-size: 13px;
-  transition: transform 0.25s ease;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  font-size: 14px;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+  overflow: hidden;
+  transition: opacity 0.22s ease, transform 0.22s ease;
+
 }
 
 #eta-sidebar.eta-hidden {
-  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-50%) translateX(16px);
 }
 
+/* ── Resize handles ────────────────────────────────────────────────────────── */
+#eta-resize-handle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 10px;
+  cursor: ew-resize;
+  z-index: 10;
+  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+  transition: background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#eta-resize-handle:hover,
+#eta-resize-handle.eta-dragging {
+  background: rgba(123, 47, 190, 0.25);
+}
+
+/* vertical grip dots on left handle */
+#eta-resize-handle::after {
+  content: '⋮';
+  font-size: 12px;
+  color: rgba(123, 47, 190, 0.5);
+  line-height: 1;
+}
+
+#eta-resize-handle-top {
+  position: absolute;
+  top: 0;
+  left: 20px;
+  right: 20px;
+  height: 6px;
+  cursor: ns-resize;
+  z-index: 10;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  transition: background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#eta-resize-handle-top:hover,
+#eta-resize-handle-top.eta-dragging {
+  background: rgba(123, 47, 190, 0.25);
+}
+
+/* grip dots indicator */
+#eta-resize-handle-top::after {
+  content: '···';
+  font-size: 10px;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 2px;
+  line-height: 6px;
+}
+
+#eta-resize-handle-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 20px;
+  right: 20px;
+  height: 6px;
+  cursor: ns-resize;
+  z-index: 10;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  transition: background 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#eta-resize-handle-bottom:hover,
+#eta-resize-handle-bottom.eta-dragging {
+  background: rgba(123, 47, 190, 0.2);
+}
+
+#eta-resize-handle-bottom::after {
+  content: '···';
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  line-height: 6px;
+}
+
+/* ── Header — dark card style ──────────────────────────────────────────────── */
 #eta-header {
-  background: #1F4E79;
-  color: #fff;
-  padding: 12px 14px;
+  background: var(--dark);
+  color: var(--text-on-dark);
+  padding: 14px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -30,30 +148,61 @@
 }
 
 #eta-header span {
-  font-weight: bold;
-  font-size: 14px;
-  letter-spacing: 0.3px;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.2px;
 }
 
 #eta-close {
-  background: none;
+  background: rgba(255,255,255,0.1);
   border: none;
-  color: #fff;
-  font-size: 18px;
+  color: var(--text-on-dark);
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-pill);
+  font-size: 16px;
+  font-weight: 900;
   cursor: pointer;
-  line-height: 1;
-  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
 }
 
+#eta-close:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+/* ── Body ──────────────────────────────────────────────────────────────────── */
 #eta-body {
   flex: 1;
+  min-height: 0;      /* critical — lets flex child shrink and scroll */
   overflow-y: auto;
-  padding: 14px;
+  overflow-x: hidden;
+  padding: 16px 14px;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  /* allow scrollbar to show without clipping */
+  scrollbar-width: thin;
+  scrollbar-color: var(--purple-dark) transparent;
 }
 
+#eta-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+#eta-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#eta-body::-webkit-scrollbar-thumb {
+  background: var(--purple-dark);
+  border-radius: 4px;
+  opacity: 0.5;
+}
+
+/* ── Category tags ─────────────────────────────────────────────────────────── */
 #eta-tags {
   display: flex;
   flex-wrap: wrap;
@@ -63,141 +212,242 @@
 
 .eta-tag {
   display: inline-block;
-  background: #7B2FBE;
-  color: #fff;
-  font-size: 11px;
-  font-weight: bold;
-  padding: 3px 9px;
-  border-radius: 12px;
-  letter-spacing: 0.3px;
+  background: var(--purple-dark);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.4px;
+  opacity: 0.92;
 }
 
+/* ── Suggest button — green pill ───────────────────────────────────────────── */
 #eta-suggest-btn {
-  background: #2E75B6;
-  color: #fff;
+  background: var(--green);
+  color: var(--dark);
   border: none;
-  border-radius: 6px;
-  padding: 9px 14px;
-  font-size: 13px;
-  font-weight: bold;
+  border-radius: var(--radius-pill);
+  padding: 12px 18px;
+  font-size: 14px;
+  font-weight: 700;
   cursor: pointer;
   width: 100%;
-  flex-shrink: 0;
+  letter-spacing: 0.3px;
+  transition: background 0.15s, transform 0.1s;
 }
 
 #eta-suggest-btn:hover {
-  background: #1F5F99;
+  background: var(--green-dark);
+  color: #fff;
+}
+
+#eta-suggest-btn:active {
+  transform: scale(0.98);
 }
 
 #eta-suggest-btn:disabled {
-  background: #aaa;
+  background: #e5e7eb;
+  color: var(--text-muted);
   cursor: default;
+  transform: none;
 }
 
+/* ── Status ────────────────────────────────────────────────────────────────── */
 #eta-status {
-  font-size: 12px;
-  color: #666;
-  min-height: 16px;
+  font-size: 11px;
+  color: var(--text-muted);
+  min-height: 14px;
   text-align: center;
+  letter-spacing: 0.2px;
 }
 
+/* ── Answer box — floating card ────────────────────────────────────────────── */
 #eta-answer-box {
-  display: none;
+  display: flex;
   flex-direction: column;
   gap: 8px;
+  background: var(--card);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  box-shadow: var(--shadow-card);
+  /* smooth reveal */
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  padding-top: 0;
+  padding-bottom: 0;
+  transition: max-height 0.38s cubic-bezier(.4,0,.2,1),
+              opacity 0.28s ease,
+              padding 0.28s ease;
+}
+
+#eta-answer-box.eta-visible {
+  max-height: 600px;
+  opacity: 1;
+  padding: 14px;
 }
 
 #eta-answer-label {
-  font-weight: bold;
-  color: #1F4E79;
-  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  font-size: 10px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 1px;
 }
 
 #eta-answer-text {
   width: 100%;
-  min-height: 140px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  padding: 8px;
+  min-height: 130px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
   font-size: 13px;
-  font-family: Arial, sans-serif;
+  font-family: inherit;
   resize: vertical;
   box-sizing: border-box;
-  line-height: 1.5;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: var(--surface);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+#eta-answer-text:focus {
+  border-color: var(--purple-dark);
 }
 
 #eta-insert-btn {
-  background: #375623;
-  color: #fff;
+  background: var(--dark);
+  color: var(--text-on-dark);
   border: none;
-  border-radius: 6px;
-  padding: 8px 14px;
-  font-size: 13px;
-  font-weight: bold;
+  border-radius: var(--radius-pill);
+  padding: 10px 18px;
+  font-size: 12px;
+  font-weight: 700;
   cursor: pointer;
+  letter-spacing: 0.3px;
+  transition: background 0.15s;
+  align-self: flex-end;
 }
 
 #eta-insert-btn:hover {
-  background: #2a3f1a;
+  background: var(--dark-card);
 }
 
+/* ── Matched threads ───────────────────────────────────────────────────────── */
 #eta-matches {
-  display: none;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.42s cubic-bezier(.4,0,.2,1),
+              opacity 0.32s ease 0.1s;
+}
+
+#eta-matches.eta-visible {
+  max-height: 800px;
+  opacity: 1;
 }
 
 #eta-matches-label {
-  font-weight: bold;
-  color: #555;
-  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  font-size: 10px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 4px;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+  padding-left: 2px;
 }
 
 .eta-match {
-  background: #F0F4FA;
-  border-left: 3px solid #2E75B6;
-  border-radius: 0 4px 4px 0;
-  padding: 7px 9px;
-  margin-bottom: 6px;
+  background: var(--card);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin-bottom: 8px;
   cursor: pointer;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.15s, box-shadow 0.15s;
+  border: 1.5px solid transparent;
 }
 
 .eta-match:hover {
-  background: #dceaf7;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.10);
+  border-color: var(--purple);
 }
 
 .eta-match-title {
-  font-weight: bold;
-  color: #1F4E79;
+  font-weight: 700;
+  color: var(--text-primary);
   font-size: 12px;
-  margin-bottom: 3px;
+  margin-bottom: 5px;
 }
 
 .eta-match-snippet {
-  color: #444;
+  color: var(--text-secondary);
   font-size: 12px;
-  line-height: 1.4;
-  white-space: pre-wrap;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .eta-match-score {
-  font-size: 11px;
-  color: #999;
-  margin-top: 3px;
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-/* ── Thread detail modal ── */
+.eta-match-score em {
+  font-style: normal;
+  color: var(--purple-dark);
+  font-weight: 600;
+}
+
+/* ── Toggle button ─────────────────────────────────────────────────────────── */
+#eta-toggle {
+  position: fixed;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  background: var(--dark);
+  color: var(--text-on-dark);
+  border: none;
+  border-radius: var(--radius-pill);
+  width: 56px;
+  height: 56px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  z-index: 99998;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+  transition: background 0.15s, box-shadow 0.15s, transform 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#eta-toggle:hover {
+  background: var(--purple-dark);
+  box-shadow: 0 6px 24px rgba(123,47,190,0.35);
+  transform: translateY(-50%) scale(1.08);
+}
+
+/* ── Thread detail modal ───────────────────────────────────────────────────── */
 #eta-modal-overlay {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.45);
+  background: rgba(26,26,46,0.55);
   z-index: 100000;
   align-items: center;
   justify-content: center;
+  backdrop-filter: blur(4px);
 }
 
 #eta-modal-overlay.eta-visible {
@@ -205,93 +455,81 @@
 }
 
 #eta-modal {
-  background: #fff;
-  border-radius: 10px;
+  background: var(--card);
+  border-radius: var(--radius-lg);
   width: 520px;
   max-width: 92vw;
   max-height: 82vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
   overflow: hidden;
 }
 
 #eta-modal-header {
-  background: #1F4E79;
-  color: #fff;
-  padding: 12px 16px;
+  background: var(--dark);
+  color: var(--text-on-dark);
+  padding: 16px 18px;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
   flex-shrink: 0;
 }
 
 #eta-modal-header-title {
-  font-size: 13px;
-  font-weight: bold;
+  font-size: 14px;
+  font-weight: 700;
   line-height: 1.4;
 }
 
 #eta-modal-close {
-  background: none;
+  background: rgba(255,255,255,0.1);
   border: none;
-  color: #fff;
-  font-size: 18px;
+  color: var(--text-on-dark);
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-pill);
+  font-size: 14px;
   cursor: pointer;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  padding: 0 2px;
+  transition: background 0.15s;
+}
+
+#eta-modal-close:hover {
+  background: rgba(255,255,255,0.2);
 }
 
 #eta-modal-body {
   overflow-y: auto;
-  padding: 16px;
+  padding: 18px;
   display: flex;
   flex-direction: column;
   gap: 14px;
+  background: var(--surface);
 }
 
 .eta-modal-section-label {
-  font-size: 11px;
-  font-weight: bold;
+  font-size: 10px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
-  margin-bottom: 5px;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
 }
 
-.eta-modal-q-label { color: #C00000; }
-.eta-modal-a-label { color: #375623; }
+.eta-modal-q-label { color: var(--purple-dark); }
+.eta-modal-a-label { color: var(--green-dark); }
 
 .eta-modal-text {
   font-size: 13px;
-  color: #222;
-  line-height: 1.6;
+  color: var(--text-primary);
+  line-height: 1.65;
   white-space: pre-wrap;
-  background: #f7f9fc;
-  border-radius: 6px;
-  padding: 10px 12px;
-  border-left: 3px solid #ddd;
-}
-
-.eta-modal-q-text { border-left-color: #2E75B6; }
-.eta-modal-a-text { border-left-color: #375623; }
-
-/* toggle button when sidebar is hidden */
-#eta-toggle {
-  position: fixed;
-  top: 50%;
-  right: 0;
-  transform: translateY(-50%);
-  background: #2E75B6;
-  color: #fff;
-  border: none;
-  border-radius: 6px 0 0 6px;
-  padding: 10px 6px;
-  font-size: 12px;
-  font-weight: bold;
-  cursor: pointer;
-  z-index: 99998;
-  writing-mode: vertical-rl;
-  letter-spacing: 1px;
+  background: var(--card);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  box-shadow: var(--shadow-card);
 }

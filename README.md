@@ -156,13 +156,21 @@ The `category` and `subcategory` values must match exactly what Ed Discussion sh
 ## Using the Extension
 
 1. Open any question thread on Ed Discussion (`/discussion/*`)
-2. The **Tutor Assistant** sidebar appears on the right
-3. Category tags (e.g. `Project` · `P1`) are read from the page and shown at the top of the sidebar
+2. A floating **Tutor Assistant** panel appears on the right, centred vertically
+3. Category tags (e.g. `Project` · `P1`) are read from the page and shown at the top
 4. Click **Suggest Answer** — the backend searches only within the matching category
 5. If the category has no records in the knowledge base, an error is shown and no API call is made
-6. Review the suggested reply in the editable text area
-7. Click a matched thread card to view its full question and answers in a modal
+6. Review the suggested reply in the editable text area; matched threads appear below with similarity scores
+7. Click a matched thread card to open a modal showing the full question and all answers
 8. Edit the reply as needed, then click **Insert into Reply Box**
+
+**Panel controls:**
+- **✕ button** or **left edge click** — hide the panel
+- **TA button** (right side) — re-open the panel
+- **Left edge drag** — resize width (280–560px)
+- **Top edge drag** — resize height upward
+- **Bottom edge drag** — resize height downward
+- **Toolbar icon** — purple when on Ed Discussion, grey elsewhere; click for health status and ⚙ Settings
 
 ---
 
@@ -212,6 +220,7 @@ Response:
 ## TODO
 
 ### In progress
+- [ ] **Scrollable panel** — panel currently grows with content; needs a hard height constraint so `#eta-body` scrolls within a fixed panel size
 - [ ] Verify reply box insertion across different Ed Discussion thread types (question, post, announcement)
 
 ### Near-term

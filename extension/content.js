@@ -89,7 +89,11 @@ function insertIntoReplyBox(text) {
 function buildSidebar() {
   const sidebar = document.createElement("div");
   sidebar.id = "eta-sidebar";
+  sidebar.contentEditable = "false";
   sidebar.innerHTML = `
+    <div id="eta-resize-handle"></div>
+    <div id="eta-resize-handle-top"></div>
+    <div id="eta-resize-handle-bottom"></div>
     <div id="eta-header">
       <span>🎓 Tutor Assistant</span>
       <button id="eta-close" title="Hide sidebar">✕</button>
@@ -172,7 +176,7 @@ function buildToggle() {
   const btn = document.createElement("button");
   btn.id = "eta-toggle";
   btn.title = "Open Tutor Assistant";
-  btn.textContent = "Tutor Assistant";
+  btn.textContent = "TA";
   return btn;
 }
 
@@ -206,8 +210,8 @@ async function fetchSuggestion() {
   const btn = document.getElementById("eta-suggest-btn");
   btn.disabled = true;
   setStatus("Searching past Q&A records…");
-  document.getElementById("eta-answer-box").style.display = "none";
-  document.getElementById("eta-matches").style.display = "none";
+  document.getElementById("eta-answer-box").classList.remove("eta-visible");
+  document.getElementById("eta-matches").classList.remove("eta-visible");
 
   // Load user settings from storage
   const prefs = await new Promise(resolve =>
@@ -237,7 +241,7 @@ async function fetchSuggestion() {
 
     // Fill answer textarea
     document.getElementById("eta-answer-text").value = data.suggested_answer;
-    document.getElementById("eta-answer-box").style.display = "flex";
+    document.getElementById("eta-answer-box").classList.add("eta-visible");
 
     // Fill matched threads
     const list = document.getElementById("eta-matches-list");
@@ -254,7 +258,7 @@ async function fetchSuggestion() {
       div.addEventListener("click", () => openModal(m));
       list.appendChild(div);
     }
-    document.getElementById("eta-matches").style.display = "block";
+    document.getElementById("eta-matches").classList.add("eta-visible");
     setStatus("Done. Edit the reply below if needed.", "#375623");
 
   } catch (e) {
@@ -301,6 +305,82 @@ function init() {
     if (insertIntoReplyBox(text)) {
       setStatus("Inserted into reply box.", "#375623");
     }
+  });
+
+  // ── Drag-to-resize (horizontal) + click to hide ────────────────────────────
+  const handle = document.getElementById("eta-resize-handle");
+  let dragH = false, startX = 0, startW = 0;
+  let mouseDownX = 0;
+
+  handle.addEventListener("mousedown", e => {
+    dragH = true;
+    startX = e.clientX;
+    mouseDownX = e.clientX;
+    startW = sidebar.offsetWidth;
+    handle.classList.add("eta-dragging");
+    document.body.style.userSelect = "none";
+    e.preventDefault();
+  });
+
+  handle.addEventListener("click", e => {
+    // Only hide if it was a tap, not a drag
+    if (Math.abs(e.clientX - mouseDownX) < 4) {
+      sidebar.classList.add("eta-hidden");
+      toggle.style.display = "flex";
+    }
+  });
+
+  // ── Drag-to-resize (vertical — drag top edge upward to grow) ───────────────
+  const handleTop = document.getElementById("eta-resize-handle-top");
+  let dragV = false, startY = 0, startH = 0;
+
+  handleTop.addEventListener("mousedown", e => {
+    dragV = true;
+    startY = e.clientY;
+    startH = sidebar.offsetHeight;
+    handleTop.classList.add("eta-dragging");
+    document.body.style.userSelect = "none";
+    e.preventDefault();
+  });
+
+  // ── Drag-to-resize (bottom edge — drag down to grow) ───────────────────────
+  const handleBottom = document.getElementById("eta-resize-handle-bottom");
+  let dragVB = false, startYB = 0, startHB = 0;
+
+  handleBottom.addEventListener("mousedown", e => {
+    dragVB = true;
+    startYB = e.clientY;
+    startHB = sidebar.offsetHeight;
+    handleBottom.classList.add("eta-dragging");
+    document.body.style.userSelect = "none";
+    e.preventDefault();
+  });
+
+  document.addEventListener("mousemove", e => {
+    if (dragH) {
+      const delta = startX - e.clientX;
+      const newW = Math.min(Math.max(startW + delta, 260), 560);
+      sidebar.style.width = newW + "px";
+    }
+    if (dragV) {
+      const delta = startY - e.clientY;
+      const maxH = window.innerHeight * 0.92;
+      const newH = Math.min(Math.max(startH + delta, 160), maxH);
+      sidebar.style.maxHeight = newH + "px";
+    }
+    if (dragVB) {
+      const delta = e.clientY - startYB;
+      const maxH = window.innerHeight * 0.92;
+      const newH = Math.min(Math.max(startHB + delta, 160), maxH);
+      sidebar.style.maxHeight = newH + "px";
+    }
+  });
+
+  document.addEventListener("mouseup", () => {
+    if (dragH)  { dragH  = false; handle.classList.remove("eta-dragging"); }
+    if (dragV)  { dragV  = false; handleTop.classList.remove("eta-dragging"); }
+    if (dragVB) { dragVB = false; handleBottom.classList.remove("eta-dragging"); }
+    document.body.style.userSelect = "";
   });
 }
 

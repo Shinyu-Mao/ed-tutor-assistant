@@ -1,6 +1,39 @@
-# Ed Tutor Assistant
+# Ed Tutor Assistant — RAG-powered Reply Assistant for Ed Discussion
 
-A Chrome extension + local Python backend that helps tutors respond to student questions on [Ed Discussion](https://edstem.org). When a tutor opens a question thread, the extension reads the title, body, and category, searches a knowledge base of past Q&A records using semantic similarity filtered by category, and uses the Claude API to draft a suggested reply.
+[![license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
+[![chrome](https://img.shields.io/badge/chrome-extension-yellow.svg)](extension/)
+[![status](https://img.shields.io/badge/status-MVP-orange.svg)]()
+
+![Claude](https://img.shields.io/badge/CLAUDE-black?style=flat&logo=anthropic&logoColor=white&labelColor=black&color=black)
+
+> **Note**
+> Ed Tutor Assistant is an MVP with core functionality working. Some features are in progress (see [TODO](#todo)). DOM selectors are confirmed for Ed Discussion as of mid-2025 and may need updating if Ed changes its markup.
+
+---
+
+## Table of Contents
+
+- [Introduction](#introduction)
+- [How It Works](#how-it-works)
+- [Project Structure](#project-structure)
+- [Setup](#setup)
+  - [Backend](#1-backend)
+  - [Chrome Extension](#2-chrome-extension)
+  - [Settings](#3-configure-settings)
+- [Data Format](#data-format)
+- [Using the Extension](#using-the-extension)
+- [API](#api)
+- [TODO](#todo)
+- [Notes for Future Development](#notes-for-future-development)
+
+---
+
+## Introduction
+
+Ed Tutor Assistant is a Chrome extension paired with a local Python backend that helps tutors respond to student questions on [Ed Discussion](https://edstem.org). It reads the current question's title, body, and category from the page, searches a local knowledge base of past Q&A records using semantic similarity, and uses the Claude API to draft a context-aware suggested reply.
+
+Tutors review and edit the suggestion before posting — the tool assists, never auto-posts.
 
 ---
 
@@ -61,7 +94,7 @@ DATA_PATH=../data/qa.json
 TOP_K=3
 ```
 
-Place your Q&A JSON at `data/qa.json` (see Data Format below), then start the server:
+Place your Q&A JSON at `data/qa.json` (see [Data Format](#data-format) below), then start the server:
 
 ```bash
 cd backend
@@ -90,7 +123,7 @@ Click the toolbar icon → **⚙ Settings** to open the options page:
 |---------|-------------|---------|
 | API Key | Anthropic API key — used per-request, falls back to `.env` if blank | — |
 | Matched threads | How many past threads to retrieve (top-k) | 3 |
-| Tone | Friendly / Formal / Bullet points / Detailed | Friendly |
+| Tone | `friendly` / `formal` / `bullet` / `detailed` | `friendly` |
 | Max reply length | Maximum words in the generated answer | 150 |
 
 ---
@@ -114,9 +147,9 @@ Click the toolbar icon → **⚙ Settings** to open the options page:
 ]
 ```
 
-Fields used: `number`, `title`, `text` (question body), `answers[].text`, `category`, `subcategory`. All other fields are ignored.
+Fields used: `number`, `title`, `text`, `answers[].text`, `category`, `subcategory`. All other fields are ignored.
 
-The `category` and `subcategory` fields drive the category-aware search — they must match the values shown in the Ed Discussion thread's category label (e.g. `"Project"` / `"P1"`).
+The `category` and `subcategory` values must match exactly what Ed Discussion shows in the thread's category label (e.g. `"Project"` / `"P1"`).
 
 ---
 
@@ -124,7 +157,7 @@ The `category` and `subcategory` fields drive the category-aware search — they
 
 1. Open any question thread on Ed Discussion (`/discussion/*`)
 2. The **Tutor Assistant** sidebar appears on the right
-3. Category tags (e.g. `Project` · `P1`) are read from the page and shown at the top
+3. Category tags (e.g. `Project` · `P1`) are read from the page and shown at the top of the sidebar
 4. Click **Suggest Answer** — the backend searches only within the matching category
 5. If the category has no records in the knowledge base, an error is shown and no API call is made
 6. Review the suggested reply in the editable text area
@@ -141,6 +174,7 @@ The `category` and `subcategory` fields drive the category-aware search — they
 | `POST` | `/suggest` | Returns suggested answer + matched threads |
 
 `POST /suggest` body:
+
 ```json
 {
   "title": "...",
@@ -154,9 +188,10 @@ The `category` and `subcategory` fields drive the category-aware search — they
 }
 ```
 
-`category`, `subcategory`, `api_key`, `top_k`, `style`, and `max_words` are all optional. `style` accepts: `friendly`, `formal`, `bullet`, `detailed`.
+All fields except `title` and `body` are optional. `style` accepts: `friendly`, `formal`, `bullet`, `detailed`.
 
 Response:
+
 ```json
 {
   "suggested_answer": "Hi, ...",
@@ -203,7 +238,7 @@ The current setup assumes a single `qa.json`. Supporting multiple course offerin
 `document.execCommand("insertText")` is deprecated and may break in future Chrome versions. Replace with the [Clipboard API](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API) (`navigator.clipboard.writeText`) and prompt the tutor to paste, or investigate Ed Discussion's internal React event system for a more robust injection approach.
 
 ### Ed Discussion DOM stability
-The content script relies on CSS class names (`disthrb-title`, `disthrb-body`, `disthrb-category`) and a `data-testid` attribute that could change with Ed updates. Consider adding a fallback that reads the page `<title>` and visible paragraph text when the primary selectors fail, and surface a warning in the sidebar when the question could not be read confidently.
+The content script relies on CSS class names (`disthrb-title`, `disthrb-body`, `disthrb-category`) and a `data-testid` attribute that could change with Ed updates. Consider adding fallback selectors and surfacing a warning in the sidebar when the question could not be read confidently.
 
 ### Authentication for the backend
-The backend currently accepts requests from any origin. If deployed for shared tutor use (rather than locally), add an API key header check to `server.py` and store the key in the extension's `chrome.storage.sync`.
+The backend currently accepts requests from any origin. If deployed for shared tutor use, add an API key header check to `server.py` and store the key in the extension's `chrome.storage.sync`.

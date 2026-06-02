@@ -95,7 +95,7 @@ function buildSidebar() {
     <div id="eta-resize-handle-top"></div>
     <div id="eta-resize-handle-bottom"></div>
     <div id="eta-header">
-      <span>🎓 Tutor Assistant</span>
+      <span>Tutor Assistant</span>
       <button id="eta-close" title="Hide sidebar">✕</button>
     </div>
     <div id="eta-body">
@@ -104,13 +104,21 @@ function buildSidebar() {
       <div id="eta-status"></div>
 
       <div id="eta-answer-box">
-        <div id="eta-answer-label">Suggested Reply</div>
-        <textarea id="eta-answer-text"></textarea>
-        <button id="eta-insert-btn">Insert into Reply Box</button>
+        <div class="eta-section-header" id="eta-answer-toggle">
+          <span id="eta-answer-label">Suggested Reply</span>
+          <span class="eta-chevron">▾</span>
+        </div>
+        <div id="eta-answer-content">
+          <textarea id="eta-answer-text"></textarea>
+          <button id="eta-insert-btn">Insert into Reply Box</button>
+        </div>
       </div>
 
       <div id="eta-matches">
-        <div id="eta-matches-label">Matched Threads</div>
+        <div class="eta-section-header" id="eta-matches-toggle">
+          <span id="eta-matches-label">Matched Threads</span>
+          <span class="eta-chevron">▾</span>
+        </div>
         <div id="eta-matches-list"></div>
       </div>
     </div>
@@ -299,6 +307,19 @@ function init() {
   });
 
   document.getElementById("eta-suggest-btn").addEventListener("click", fetchSuggestion);
+
+  // ── Collapsible sections ────────────────────────────────────────────────────
+  function wireCollapse(toggleId, contentId) {
+    const toggle = document.getElementById(toggleId);
+    const content = document.getElementById(contentId);
+    const chevron = toggle.querySelector(".eta-chevron");
+    toggle.addEventListener("click", () => {
+      const collapsed = content.classList.toggle("eta-collapsed");
+      chevron.textContent = collapsed ? "▸" : "▾";
+    });
+  }
+  wireCollapse("eta-answer-toggle", "eta-answer-content");
+  wireCollapse("eta-matches-toggle", "eta-matches-list");
 
   document.getElementById("eta-insert-btn").addEventListener("click", () => {
     const text = document.getElementById("eta-answer-text").value;

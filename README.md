@@ -170,6 +170,7 @@ The `category` and `subcategory` values must match exactly what Ed Discussion sh
 - **Left edge drag** — resize width (280–560px)
 - **Top edge drag** — resize height upward
 - **Bottom edge drag** — resize height downward
+- **Suggested Reply / Matched Threads headers** — click to collapse or expand each section (chevron indicator)
 - **Toolbar icon** — purple when on Ed Discussion, grey elsewhere; click for health status and ⚙ Settings
 
 ---

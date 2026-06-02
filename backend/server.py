@@ -24,12 +24,12 @@ import generate as generate_module
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    data_path = os.environ.get("DATA_PATH", "../data/qa.json")
+    data_path = os.environ.get("DATA_PATH", "../data")
     data_path = os.path.abspath(os.path.join(os.path.dirname(__file__), data_path))
     if not os.path.exists(data_path):
         raise FileNotFoundError(
             f"Knowledge base not found at {data_path}. "
-            "Copy your anonymised Q&A JSON to data/qa.json"
+            "Set DATA_PATH to a .json file or a directory containing .json files."
         )
     search_module.load_knowledge_base(data_path)
     yield

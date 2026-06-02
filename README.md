@@ -90,11 +90,12 @@ Edit `backend/.env` (optional if you set the API key via extension settings):
 
 ```
 ANTHROPIC_API_KEY=your_key_here
-DATA_PATH=../data/qa.json
+# DATA_PATH can be a single JSON file or a directory containing multiple JSON files
+DATA_PATH=../data
 TOP_K=3
 ```
 
-Place your Q&A JSON at `data/qa.json` (see [Data Format](#data-format) below), then start the server:
+Place your Q&A JSON file(s) in the `data/` directory (see [Data Format](#data-format) below), then start the server:
 
 ```bash
 cd backend
@@ -130,7 +131,9 @@ Click the toolbar icon → **⚙ Settings** to open the options page:
 
 ## Data Format
 
-`data/qa.json` must be a JSON array. Each object with at least one answer will be indexed:
+`DATA_PATH` in `.env` can point to either a single JSON file or a directory. If a directory is given, all `.json` files inside are loaded and merged at startup — useful for splitting data by semester or course.
+
+Each JSON file must be an array. Each object with at least one answer will be indexed:
 
 ```json
 [
@@ -149,7 +152,9 @@ Click the toolbar icon → **⚙ Settings** to open the options page:
 
 Fields used: `number`, `title`, `text`, `answers[].text`, `category`, `subcategory`. All other fields are ignored.
 
-The `category` and `subcategory` values must match exactly what Ed Discussion shows in the thread's category label (e.g. `"Project"` / `"P1"`).
+The `category` and `subcategory` values must match exactly what Ed Discussion shows in the thread's category label (e.g. `"Project"` / `"P1"`). The extension parses the label by splitting on ` – ` (spaced en/em dash), so subcategory names containing hyphens (e.g. `Prac-week1`) are handled correctly.
+
+**Multiple files:** drop any number of `.json` files into `data/` — all are loaded and merged at startup. Each file's entry count is logged. Use separate files per course or semester if preferred.
 
 ---
 
@@ -223,6 +228,10 @@ Response:
 ### In progress
 - [ ] **Scrollable panel** — panel currently grows with content; needs a hard height constraint so `#eta-body` scrolls within a fixed panel size
 - [ ] Verify reply box insertion across different Ed Discussion thread types (question, post, announcement)
+
+### Recently fixed
+- [x] **Category parsing** — subcategory names containing hyphens (e.g. `Prac-week1`) now parsed correctly by splitting on spaced en/em dash only
+- [x] **Multi-file knowledge base** — `DATA_PATH` now accepts a directory; all `.json` files are loaded and merged at startup
 
 ### Near-term
 - [ ] **Persistent vector index** — serialise embeddings to disk so startup is instant on subsequent runs

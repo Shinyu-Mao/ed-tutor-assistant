@@ -23,12 +23,32 @@ def _get_model() -> SentenceTransformer:
     return _model
 
 
+def _load_json_files(path: str) -> list[dict]:
+    """Load one JSON file or all JSON files in a directory."""
+    if os.path.isdir(path):
+        entries = []
+        files = sorted(f for f in os.listdir(path) if f.endswith(".json"))
+        if not files:
+            raise FileNotFoundError(f"No .json files found in directory: {path}")
+        for fname in files:
+            fpath = os.path.join(path, fname)
+            with open(fpath, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            entries.extend(data if isinstance(data, list) else [data])
+            print(f"  Loaded {fname} ({len(data)} entries)")
+        return entries
+    else:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return data if isinstance(data, list) else [data]
+
+
 def load_knowledge_base(path: str) -> None:
-    """Load and embed the Q&A JSON. Call once at startup."""
+    """Load and embed Q&A records from a file or directory. Call once at startup."""
     global _records, _embeddings
 
-    with open(path, "r", encoding="utf-8") as f:
-        raw = json.load(f)
+    print(f"Loading knowledge base from: {path}")
+    raw = _load_json_files(path)
 
     # Only index entries that have at least one answer
     _records = []

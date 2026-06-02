@@ -47,7 +47,8 @@ function getCategoryInfo() {
   const el = document.querySelector("span.disthrb-category, [class*='disthrb-category']");
   if (!el) return { category: null, subcategory: null };
   // Text is like "Project – P2" or "Lectures – Week1"
-  const parts = el.innerText.split(/[–—-]/).map(s => s.trim());
+  // Split only on en/em dash surrounded by spaces — not on hyphens within names
+  const parts = el.innerText.split(/\s[–—]\s/).map(s => s.trim());
   return {
     category: parts[0] || null,
     subcategory: parts[1] || null,
